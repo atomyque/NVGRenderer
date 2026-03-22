@@ -50,7 +50,10 @@ object NVG {
     }
 
     fun beginFrame(width: Float, height: Float) {
-        val dpr = devicePixelRatio()
+        beginFrame(width, height, devicePixelRatio())
+    }
+
+    fun beginFrame(width: Float, height: Float, dpr: Float) {
         nvgBeginFrame(vg, width / dpr, height / dpr, dpr)
         nvgTextAlign(vg, NVG_ALIGN_LEFT or NVG_ALIGN_TOP)
     }

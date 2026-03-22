@@ -12,7 +12,7 @@ object NVGBatcher {
 
     @JvmStatic
     fun endRenderHook(context: GuiGraphics, mc: Minecraft) {
-        PIPNVG.draw(context, 0, 0, mc.window.screenWidth, mc.window.screenHeight) {
+        PIPNVG.drawNVG(context, 0, 0, mc.window.screenWidth, mc.window.screenHeight) {
             callbacks.forEach { it.run() }
         }
     }

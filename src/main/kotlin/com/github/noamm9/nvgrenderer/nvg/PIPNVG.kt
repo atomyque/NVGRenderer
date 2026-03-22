@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.MultiBufferSource
 import org.joml.Matrix3x2f
 import org.lwjgl.opengl.GL33C
 
-class PIPNVG(vertexConsumers: MultiBufferSource.BufferSource): PictureInPictureRenderer<PIPNVG.NVGRenderState>(vertexConsumers) {
+class PIPNVG(buffer: MultiBufferSource.BufferSource): PictureInPictureRenderer<PIPNVG.NVGRenderState>(buffer) {
     override fun getTranslateY(height: Int, windowScaleFactor: Int): Float = height / 2f
     override fun getRenderStateClass(): Class<NVGRenderState> = NVGRenderState::class.java
     override fun textureIsReadyToBlit(state: NVGRenderState) = false
@@ -33,10 +33,11 @@ class PIPNVG(vertexConsumers: MultiBufferSource.BufferSource): PictureInPictureR
         GlStateManager._viewport(0, 0, width, height)
         GL33C.glBindSampler(0, 0)
 
-        NVG.beginFrame(width.toFloat(), height.toFloat())
+        val dpr = if (state.width > 0 && state.height > 0) width.toFloat() / state.width.toFloat() else NVG.devicePixelRatio()
+        NVG.beginFrame(width.toFloat(), height.toFloat(), dpr)
         state.renderContent()
         NVG.endFrame()
-        
+
         GlStateManager._disableDepthTest()
         GlStateManager._disableCull()
         GlStateManager._enableBlend()
@@ -46,8 +47,8 @@ class PIPNVG(vertexConsumers: MultiBufferSource.BufferSource): PictureInPictureR
     data class NVGRenderState(
         private val x: Int,
         private val y: Int,
-        private val width: Int,
-        private val height: Int,
+        val width: Int,
+        val height: Int,
         private val poseMatrix: Matrix3x2f,
         private val scissor: ScreenRectangle?,
         private val bounds: ScreenRectangle?,
@@ -63,14 +64,25 @@ class PIPNVG(vertexConsumers: MultiBufferSource.BufferSource): PictureInPictureR
     }
 
     companion object {
-        @JvmStatic
-        fun draw(context: GuiGraphics, x: Int, y: Int, width: Int, height: Int, renderContent: () -> Unit) {
-            if (Minecraft.getInstance().window.isIconified || width <= 0 || height <= 0) return
+        private fun createState(
+            context: GuiGraphics,
+            x: Int,
+            y: Int,
+            width: Int,
+            height: Int,
+            renderContent: () -> Unit
+        ): NVGRenderState? {
+            if (Minecraft.getInstance().window.isIconified || width <= 0 || height <= 0) return null
             val scissor = context.scissorStack.peek()
             val pose = Matrix3x2f(context.pose())
             val bounds = createBounds(x, y, x + width, y + height, pose, scissor)
-            if (bounds == null || bounds.width <= 0 || bounds.height <= 0) return
-            val state = NVGRenderState(x, y, width, height, pose, scissor, bounds, renderContent)
+            if (bounds == null || bounds.width <= 0 || bounds.height <= 0) return null
+            return NVGRenderState(x, y, width, height, pose, scissor, bounds, renderContent)
+        }
+
+        @JvmStatic
+        fun drawNVG(context: GuiGraphics, x: Int, y: Int, width: Int, height: Int, renderContent: () -> Unit) {
+            val state = createState(context, x, y, width, height, renderContent) ?: return
             context.guiRenderState.submitPicturesInPictureState(state)
         }
 

@@ -2,6 +2,7 @@ package com.github.noamm9.nvgrenderer.mixin;
 
 
 import com.github.noamm9.nvgrenderer.batchers.NVGBatcher;
+import com.github.noamm9.nvgrenderer.batchers.MultiPassBatcher;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -23,5 +24,6 @@ public class MixinGameRenderer {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderDeferredSubtitles()V"))
     private void onRenderEnd(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci, @Local GuiGraphics context) {
         NVGBatcher.endRenderHook(context, minecraft);
+        MultiPassBatcher.endRenderHook(context, minecraft);
     }
 }
