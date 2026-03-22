@@ -96,11 +96,12 @@ You can load images from a classpath resource, a file path, or a URL. SVGs are s
 ```kotlin
 import com.github.noamm9.nvgrenderer.nvg.NVG
 
-val img = NVG.createImage("/assets/yourmodid/textures/gui/icon.png")
-NVG.image(img, 10f, 90f, 32f, 32f, 6f)
+val img1 = NVG.createImage("/assets/yourmodid/images/image.png")
+val img2 = NVG.createImage("https://bigrat.monster/")
+NVG.image(img1, 10f, 90f, 32f, 32f, 6f)
 
 // when done with the image
-NVG.deleteImage(img)
+NVG.deleteImage(img1)
 ```
 
 ## Manual PIP Rendering
@@ -117,8 +118,9 @@ PIPNVG.draw(context, x, y, width, height) {
 
 ## License
 
-Unlicense. See `LICENSE.txt`.
+Unlicense. Third-party BSD-3-Clause notices are included. See `LICENSE.txt`.
 
 ## Credits
 
-odtheking - [OdinFabric](https://github.com/odtheking/OdinFabric): Base for `NVG.kt` & `NvgTextInputHandler`
+odtheking - [Odin (Fabric)](https://github.com/odtheking/Odin): Portions of the NanoVG rendering/input logic are derived
+from this project (BSD-3-Clause).

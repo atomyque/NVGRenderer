@@ -37,7 +37,7 @@ class Image(
     companion object {
         private fun getBytes(path: String): ByteArray {
             val trimmedPath = path.trim()
-            return if (trimmedPath.startsWith("http")) runBlocking { WebUtils.downloadBytes(trimmedPath).getOrThrow() }
+            return if (trimmedPath.startsWith("http")) runBlocking { WebUtils.downloadBytes(trimmedPath) }
             else {
                 val file = File(trimmedPath)
                 if (file.exists() && file.isFile) Files.newInputStream(file.toPath()).use { it.readBytes() }

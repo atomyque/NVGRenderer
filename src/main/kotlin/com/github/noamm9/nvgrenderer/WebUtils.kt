@@ -10,23 +10,15 @@ object WebUtils {
     private const val PRIVATE_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     private val SUCCESS_RANGE = 200 .. 299
 
-    fun prepareConnection(url: String): HttpURLConnection {
+    suspend fun downloadBytes(url: String): ByteArray = withContext(Dispatchers.IO) {
         val connection = URI(url).toURL().openConnection() as HttpURLConnection
         connection.setRequestProperty("User-Agent", PRIVATE_USER_AGENT)
-        return connection
-    }
+        connection.requestMethod = "GET"
 
-    suspend fun downloadBytes(url: String): Result<ByteArray> = withContext(Dispatchers.IO) {
-        runCatching {
-            val connection = prepareConnection(url)
-            connection.requestMethod = "GET"
+        val code = connection.responseCode
+        val stream = if (code in SUCCESS_RANGE) connection.inputStream else connection.errorStream
+        if (code !in SUCCESS_RANGE) throw IllegalStateException("HTTP $code")
 
-            val code = connection.responseCode
-            val stream = if (code in SUCCESS_RANGE) connection.inputStream else connection.errorStream
-
-            if (code !in SUCCESS_RANGE) throw IllegalStateException("HTTP $code")
-
-            stream.use { it.readBytes() }
-        }
+        stream.use { it.readBytes() }
     }
 }
