@@ -7,8 +7,9 @@ plugins {
     id("maven-publish")
 }
 
-version = project.property("mod_version") as String
-group = project.property("maven_group") as String
+group = (findProperty("group") as String?) ?: (findProperty("maven_group") as String)
+version = (findProperty("version") as String?)?.takeIf { it != "unspecified" }
+    ?: (findProperty("mod_version") as String)
 
 base {
     archivesName.set(project.property("archives_base_name") as String)
@@ -62,5 +63,14 @@ tasks.withType<KotlinCompile>().configureEach {
 tasks.jar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = project.property("archives_base_name") as String
+            from(components["java"])
+        }
     }
 }
