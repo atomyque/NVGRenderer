@@ -3,7 +3,7 @@
 package com.github.noamm9.nvgrenderer.nvg
 
 import net.minecraft.client.Minecraft
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.lwjgl.nanovg.NVGColor
 import org.lwjgl.nanovg.NVGPaint
 import org.lwjgl.nanovg.NanoSVG.*
@@ -25,7 +25,7 @@ object NVG {
     private val nvgColor = NVGColor.malloc()
     private val nvgColor2: NVGColor = NVGColor.malloc()
 
-    val font = Font("Default", Minecraft.getInstance().resourceManager.getResource(ResourceLocation.parse("nvgrenderer:inter.ttf")).get().open())
+    val font = Font("Default", Minecraft.getInstance().resourceManager.getResource(Identifier.parse("nvgrenderer:inter.ttf")).get().open())
 
     private val fontMap = HashMap<Font, NVGFont>()
     private val fontBounds = FloatArray(4)

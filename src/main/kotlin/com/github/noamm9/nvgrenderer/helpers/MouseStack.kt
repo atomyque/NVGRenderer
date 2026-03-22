@@ -1,4 +1,4 @@
-package com.github.noamm9.nvgrenderer.nvg.ui
+package com.github.noamm9.nvgrenderer.helpers
 
 import net.minecraft.client.Minecraft
 import org.joml.Matrix3x2f

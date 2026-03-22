@@ -6,8 +6,8 @@ import java.awt.Color
 
 object NvgText {
     var font: Font = NVG.font
-    var size: Float = 16f
-    var lineHeight: Float = 17.5f
+    var size: Float = 9f
+    var lineHeight: Float = 8.2f
 
     enum class Align { LEFT, CENTER, RIGHT }
 

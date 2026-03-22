@@ -1,17 +1,24 @@
 package com.github.noamm9.nvgrenderer
 
+import com.github.noamm9.nvgrenderer.batchers.MouseBatcher
+import com.github.noamm9.nvgrenderer.batchers.multipass.MultiPassBatcher
+import com.github.noamm9.nvgrenderer.helpers.MouseStack
+import com.github.noamm9.nvgrenderer.nvg.NVG
 import com.github.noamm9.nvgrenderer.nvg.PIPNVG
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.network.chat.Component
+import java.awt.Color
 
 class Nvgrenderer: ClientModInitializer {
     override fun onInitializeClient() {
         SpecialGuiElementRegistry.register { PIPNVG(it.vertexConsumers()) }
 
-        /*
         MultiPassBatcher.addCallback { ctx ->
             ctx.push()
-            ctx.translate(100, 100)
+            ctx.translate(200, 200)
             ctx.scale(1.25)
 
             ctx.nvg {
@@ -30,7 +37,7 @@ class Nvgrenderer: ClientModInitializer {
             if (event.button != 0) return@addCallbackClick false
             val stack = MouseStack()
             stack.push()
-            stack.translate(100, 100)
+            stack.translate(200, 200)
             stack.scale(1.25)
 
             if (stack.x.toInt() in 0 .. 120 && stack.y.toInt() in 0 .. 40) {
@@ -42,6 +49,6 @@ class Nvgrenderer: ClientModInitializer {
             false
         }
 
-         */
+        //  */
     }
 }

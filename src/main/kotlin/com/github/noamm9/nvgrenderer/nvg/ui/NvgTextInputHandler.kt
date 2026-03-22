@@ -55,7 +55,7 @@ class NvgTextInputHandler(
         if (previousMousePos != mouseX to mouseY) mouseDragged(mouseX)
         previousMousePos = mouseX to mouseY
 
-        NvgRendererState.pushScissor(x, y, width, height)
+        NVG.pushScissor(x, y, width, height)
         if (selectionWidth != 0f) {
             val sx = x + caretX + 8f
             val sw = selectionWidth
@@ -75,7 +75,7 @@ class NvgTextInputHandler(
 
         NvgText.draw(text + suffix.orEmpty(), x + 8f - textOffset, y + height / 2f - 12f)
 
-        NvgRendererState.popScissor()
+        NVG.popScissor()
     }
 
     fun mouseClicked(mouseX: Float, mouseY: Float, click: MouseButtonEvent): Boolean {
