@@ -6,7 +6,6 @@ import org.lwjgl.system.MemoryUtil
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.ByteBuffer
-import java.nio.file.Files
 
 class Image(
     val location: String,
@@ -14,7 +13,6 @@ class Image(
     var bytes: ByteArray = getBytes(location),
     private var buffer: ByteBuffer? = null
 ) {
-
     init {
         isSVG = location.endsWith(".svg", true)
     }
@@ -37,12 +35,15 @@ class Image(
     companion object {
         private fun getBytes(path: String): ByteArray {
             val trimmedPath = path.trim()
-            return if (trimmedPath.startsWith("http")) runBlocking { WebUtils.downloadBytes(trimmedPath) }
-            else {
-                val file = File(trimmedPath)
-                if (file.exists() && file.isFile) Files.newInputStream(file.toPath()).use { it.readBytes() }
-                else this::class.java.getResourceAsStream(trimmedPath)?.use { it.readBytes() } ?: throw FileNotFoundException(trimmedPath)
-            }
+
+            if (trimmedPath.startsWith("http")) return runBlocking { WebUtils.downloadBytes(trimmedPath) }
+            File(trimmedPath).takeIf { it.exists() && it.isFile }?.let { return it.readBytes() }
+
+            val resourcePath = trimmedPath.removePrefix("/")
+            val stream = Thread.currentThread().contextClassLoader.getResourceAsStream(resourcePath)
+                ?: Image::class.java.getResourceAsStream("/$resourcePath")
+
+            return stream?.use { it.readBytes() } ?: throw FileNotFoundException("Could not find: $trimmedPath")
         }
     }
 }

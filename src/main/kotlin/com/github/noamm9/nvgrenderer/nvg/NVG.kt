@@ -14,6 +14,7 @@ import org.lwjgl.stb.STBImage.stbi_load_from_memory
 import org.lwjgl.system.MemoryUtil.memAlloc
 import org.lwjgl.system.MemoryUtil.memFree
 import java.awt.Color
+import java.awt.Image
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import kotlin.math.max
@@ -25,16 +26,19 @@ object NVG {
     private val nvgColor = NVGColor.malloc()
     private val nvgColor2: NVGColor = NVGColor.malloc()
 
-    val font = Font("Default", Minecraft.getInstance().resourceManager.getResource(Identifier.parse("nvgrenderer:inter.ttf")).get().open())
+    val font by lazy {
+        Font("Default", Minecraft.getInstance().resourceManager.getResource(Identifier.parse("nvgrenderer:inter.ttf")).get().open())
+    }
 
     private val fontMap = HashMap<Font, NVGFont>()
     private val fontBounds = FloatArray(4)
 
-    private val images = HashMap<Image, NVGImage>()
+    private val images = HashMap<java.awt.Image, NVGImage>()
 
     private var scissor: Scissor? = null
-    private var vg = nvgCreate(NVG_ANTIALIAS or NVG_STENCIL_STROKES).also {
-        require(it != - 1L) { "Failed to initialize NanoVG" }
+    private val vg by lazy {
+        nvgCreate(NVG_ANTIALIAS or NVG_STENCIL_STROKES).takeUnless { it == - 1L }
+            ?: throw RuntimeException("Failed to create nvg")
     }
 
     fun devicePixelRatio(): Float {
@@ -321,30 +325,30 @@ object NVG {
         nvgFill(vg)
     }
 
-    fun image(image: Image, x: Float, y: Float, w: Float, h: Float, radius: Float) {
-        nvgImagePattern(vg, x, y, w, h, 0f, getImage(image), 1f, nvgPaint)
+    fun image(image: java.awt.Image, x: Number, y: Number, w: Number, h: Number, radius: Number) {
+        nvgImagePattern(vg, x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat(), 0f, getImage(image), 1f, nvgPaint)
         nvgBeginPath(vg)
-        nvgRoundedRect(vg, x, y, w, h + .5f, radius)
+        nvgRoundedRect(vg, x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat() + .5f, radius.toFloat())
         nvgFillPaint(vg, nvgPaint)
         nvgFill(vg)
     }
 
-    fun image(image: Image, x: Float, y: Float, w: Float, h: Float) {
-        nvgImagePattern(vg, x, y, w, h, 0f, getImage(image), 1f, nvgPaint)
+    fun image(image: java.awt.Image, x: Number, y: Number, w: Number, h: Number) {
+        nvgImagePattern(vg, x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat(), 0f, getImage(image), 1f, nvgPaint)
         nvgBeginPath(vg)
-        nvgRect(vg, x, y, w, h + .5f)
+        nvgRect(vg, x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat() + .5f)
         nvgFillPaint(vg, nvgPaint)
         nvgFill(vg)
     }
 
-    fun createImage(resourcePath: String): Image {
-        val image = images.keys.find { it.location == resourcePath } ?: Image(resourcePath)
+    fun createImage(resourcePath: String): java.awt.Image {
+        val image = images.keys.find { it.location == resourcePath } ?: java.awt.Image(resourcePath)
         if (image.isSVG) images.getOrPut(image) { NVGImage(0, loadSVG(image)) }.count ++
         else images.getOrPut(image) { NVGImage(0, loadImage(image)) }.count ++
         return image
     }
 
-    fun deleteImage(image: Image) {
+    fun deleteImage(image: java.awt.Image) {
         val nvgImage = images[image] ?: return
         nvgImage.count --
         if (nvgImage.count == 0) {
@@ -353,11 +357,11 @@ object NVG {
         }
     }
 
-    private fun getImage(image: Image): Int {
+    private fun getImage(image: java.awt.Image): Int {
         return images[image]?.nvg ?: throw IllegalStateException("Image (${image.location}) doesn't exist")
     }
 
-    private fun loadImage(image: Image): Int {
+    private fun loadImage(image: java.awt.Image): Int {
         val w = IntArray(1)
         val h = IntArray(1)
         val channels = IntArray(1)
