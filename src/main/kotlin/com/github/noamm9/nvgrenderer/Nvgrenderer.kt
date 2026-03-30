@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW
 
 object Nvgrenderer: ClientModInitializer {
     private val openDemoKey = KeyBindingHelper.registerKeyBinding(
-        KeyMapping("nvg demo", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F8, KeyMapping.Category.DEBUG)
+        KeyMapping("nvg demo", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F8, KeyMapping.Category.MISC)
     )
 
     override fun onInitializeClient() {
